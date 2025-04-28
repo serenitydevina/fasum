@@ -109,7 +109,15 @@ class _AddPostScreenState extends State<AddPostScreen> {
       });
       if(!mounted)return;
       Navigator.pop(context);
-  }catch(e){}
+  }catch(e){
+    debugPrint('Upload failed: $e');
+    if(!mounted)return;
+    setState(() => _isUploading = false);
+      ScaffoldMessenger.of(
+        context,)
+        .showSnackBar(
+        SnackBar(content: Text('Failed to upload post: $e')));
+  }
   }
 
   void _showImageSourceDialog() {
