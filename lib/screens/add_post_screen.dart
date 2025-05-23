@@ -294,7 +294,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
            final userDoc =
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
-      final fullName = userDoc.data()?['fullname'] ?? 'Anonymous';
+      final fullName = userDoc.data()?['fullName'] ?? 'Anonymous';
 
       await FirebaseFirestore.instance.collection('posts').add({
         'image': _base64Image,
@@ -303,7 +303,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         'createdAt': now,
         'latitude': _latitude,
         'longitude': _longitude,
-        'fullName': fullName,
+        'fullname': fullName,
         'userId': uid,
       });
 
