@@ -1,3 +1,4 @@
+import 'package:fasum/l10n/app_localizations.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +20,7 @@ class SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign In')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).signIn)),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -32,8 +33,8 @@ class SignInScreenState extends State<SignInScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
+                    decoration: InputDecoration(
+                      labelText:  AppLocalizations.of(context).email,
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.email),
                     ),
@@ -41,7 +42,7 @@ class SignInScreenState extends State<SignInScreen> {
                       if (value == null ||
                           value.isEmpty ||
                           !_isValidEmail(value)) {
-                        return 'Please enter a valid email';
+                        return  AppLocalizations.of(context).pleaseEnterValidEmail;
                       }
                       return null;
                     },
@@ -51,7 +52,7 @@ class SignInScreenState extends State<SignInScreen> {
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: AppLocalizations.of(context).password,
                       border: const OutlineInputBorder(),
                       prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
@@ -69,7 +70,7 @@ class SignInScreenState extends State<SignInScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return AppLocalizations.of(context).pleaseEnterPassword;
                       }
                       return null;
                     },
@@ -79,7 +80,7 @@ class SignInScreenState extends State<SignInScreen> {
                       ? const CircularProgressIndicator()
                       : ElevatedButton(
                         onPressed: _signIn,
-                        child: const Text('Sign In'),
+                        child:Text(AppLocalizations.of(context).signIn),
                       ),
                   const SizedBox(height: 16.0),
                   RichText(
@@ -89,9 +90,9 @@ class SignInScreenState extends State<SignInScreen> {
                         color: Colors.black,
                       ),
                       children: [
-                        const TextSpan(text: "Don't have an account?"),
+                        TextSpan(text:' ${AppLocalizations.of(context).dontHaveAccount}'),
                         TextSpan(
-                          text: "Sign Up",
+                          text: ' ${AppLocalizations.of(context).signUp}',
                           style: const TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
@@ -159,11 +160,11 @@ class SignInScreenState extends State<SignInScreen> {
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':
-        return 'No user found with that email';
+        return AppLocalizations.of(context).noUserFound;
       case 'wrong-password':
-        return 'Wrong password. Please try again.';
+        return AppLocalizations.of(context).wrongPassword;
       default:
-        return 'An error occurred. Please try again.';
+        return AppLocalizations.of(context).genericError;
     }
   }
 }
