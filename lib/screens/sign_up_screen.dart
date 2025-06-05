@@ -171,7 +171,7 @@ class SignUpScreenState extends State<SignUpScreen> {
     } on FirebaseAuthException catch (error) {
       _showErrorMessage(_getAuthErrorMessage(error.code));
     } catch (error) {
-      _showErrorMessage('An error occurred: $error');
+      _showErrorMessage(AppLocalizations.of(context).errorOccurred(error.toString()));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -192,13 +192,13 @@ class SignUpScreenState extends State<SignUpScreen> {
   String _getAuthErrorMessage(String code) {
     switch (code) {
       case 'weak-password':
-        return 'The password provided is too weak.';
+        return AppLocalizations.of(context).weakPassword;
       case 'email-already-in-use':
-        return 'The account already exists for that email.';
+        return AppLocalizations.of(context).emailAlreadyInUse;
       case 'invalid-email':
-        return 'The email address is not valid.';
+        return AppLocalizations.of(context).invalidEmail;
       default:
-        return 'An error occurred. Please try again.';
+        return AppLocalizations.of(context).genericError;
     }
   }
 

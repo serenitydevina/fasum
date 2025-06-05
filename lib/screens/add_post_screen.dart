@@ -132,6 +132,30 @@ class _AddPostScreenState extends State<AddPostScreen> {
       final base64Image = base64Encode(imageBytes);
       const apiKey = 'AIzaSyA9RjI889xYVZpFtwpeIZj_MQKtBhCc8jI';
       const url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=$apiKey';
+      final lang = Localizations.localeOf(context).languageCode;
+      final prompt = lang == 'id' ?""" 
+      Berdasarkan foto ini, identifikasi satu kategori utama kerusakan fasilitas umum
+      dari daftar berikut: Jalan Rusak, Marka Pudar, Lampu Mati, Trotoar Rusak,
+      Rambu Rusak, Jembatan Rusak, Sampah Menumpuk, Saluran Tersumbat, Sungai Tercemar, 
+      Sampah Sungai, Pohon Tumbang, Taman Rusak, Fasilitas Rusak, Pipa Bocor, 
+      Vandalisme, Banjir, dan Lainnya. 
+      Pilih kategori yang paling dominan atau paling mendesak untuk dilaporkan. 
+      Buat deskripsi singkat untuk laporan perbaikan, dan tambahkan permohonan perbaikan. 
+      Fokus pada kerusakan yang terlihat dan hindari spekulasi.\n\n
+      Format output yang diinginkan:\n
+      Kategori: [satu kategori yang dipilih]\n"
+      Deskripsi: [deskripsi singkat],
+      """ : """
+Based on this photo, identify one main category of public facility damage from the following list:
+Damaged Road, Faded Road Markings, Broken Street Light, Damaged Sidewalk, Broken Traffic Sign, Broken Bridge, Piled Garbage,
+Clogged Drain, Polluted River, River Garbage, Fallen Tree, Damaged Park, Broken Facility,
+Leaking Pipe, Vandalism, Flood, and Others.
+Choose the most dominant or urgent category to report.
+Write a short description of the issue and request for repair. Focus only on visible damage.\n\n
+Output format:\n
+kategori: [category]\n
+deskripsi: [short description]\n
+      """;
       final body = jsonEncode({
         "contents": [
           {
@@ -141,17 +165,18 @@ class _AddPostScreenState extends State<AddPostScreen> {
               },
               {
                 "text":
-                    "Berdasarkan foto ini, identifikasi satu kategori utama kerusakan fasilitas umum "
-                    "dari daftar berikut: Jalan Rusak, Marka Pudar, Lampu Mati, Trotoar Rusak, "
-                    "Rambu Rusak, Jembatan Rusak, Sampah Menumpuk, Saluran Tersumbat, Sungai Tercemar, "
-                    "Sampah Sungai, Pohon Tumbang, Taman Rusak, Fasilitas Rusak, Pipa Bocor, "
-                    "Vandalisme, Banjir, dan Lainnya. "
-                    "Pilih kategori yang paling dominan atau paling mendesak untuk dilaporkan. "
-                    "Buat deskripsi singkat untuk laporan perbaikan, dan tambahkan permohonan perbaikan. "
-                    "Fokus pada kerusakan yang terlihat dan hindari spekulasi.\n\n"
-                    "Format output yang diinginkan:\n"
-                    "Kategori: [satu kategori yang dipilih]\n"
-                    "Deskripsi: [deskripsi singkat]",
+                    // "Berdasarkan foto ini, identifikasi satu kategori utama kerusakan fasilitas umum "
+                    // "dari daftar berikut: Jalan Rusak, Marka Pudar, Lampu Mati, Trotoar Rusak, "
+                    // "Rambu Rusak, Jembatan Rusak, Sampah Menumpuk, Saluran Tersumbat, Sungai Tercemar, "
+                    // "Sampah Sungai, Pohon Tumbang, Taman Rusak, Fasilitas Rusak, Pipa Bocor, "
+                    // "Vandalisme, Banjir, dan Lainnya. "
+                    // "Pilih kategori yang paling dominan atau paling mendesak untuk dilaporkan. "
+                    // "Buat deskripsi singkat untuk laporan perbaikan, dan tambahkan permohonan perbaikan. "
+                    // "Fokus pada kerusakan yang terlihat dan hindari spekulasi.\n\n"
+                    // "Format output yang diinginkan:\n"
+                    // "Kategori: [satu kategori yang dipilih]\n"
+                    // "Deskripsi: [deskripsi singkat]",
+                    prompt
               },
             ],
           },
@@ -204,7 +229,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Location services are disabled.')),
+          SnackBar(content: Text(AppLocalizations.of(context).locationServicesDisabled)),
         );
         return;
       }
@@ -215,7 +240,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         if (permission == LocationPermission.deniedForever ||
             permission == LocationPermission.denied) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Location permissions are denied.')),
+            SnackBar(content: Text(AppLocalizations.of(context).locationPermissionsDenied)),
           );
           return;
         }
@@ -232,7 +257,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     } catch (e) {
       debugPrint('Failed to retrieve location: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to retrieve location: $e')),
+        SnackBar(content: Text(AppLocalizations.of(context).failedToRetrieveLocation(e.toString()))),
       );
       setState(() {
         _latitude = null;
@@ -260,13 +285,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
     if (response.statusCode == 200) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✅ Notifikasi berhasil dikirim')),
+          SnackBar(content: Text(AppLocalizations.of(context).notificationSent)),
         );
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Gagal kirim notifikasi: ${response.body}')),
+          SnackBar(content: Text(AppLocalizations.of(context).notificationFailed(response.body))),
         );
       }
     }
@@ -275,7 +300,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   Future<void> _submitPost() async {
     if (_base64Image == null || _descriptionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please add an image and description.')),
+        SnackBar(content: Text(AppLocalizations.of(context).pleaseAddImageAndDescription)),
       );
       return;
     }
@@ -288,7 +313,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
     if (uid == null) {
       setState(() => _isUploading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User not found. Please sign in.')),
+        SnackBar(content: Text(AppLocalizations.of(context).userNotFoundPleaseSignIn)),
       );
       return;
     }
@@ -318,14 +343,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
       Navigator.pop(context);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Post uploaded successfully!')));
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).postUploadedSuccessfully)));
     } catch (e) {
       debugPrint('Upload failed: $e');
       if (!mounted) return;
       setState(() => _isUploading = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Failed to upload the post: $e')));
+      ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToUploadPost(e.toString()))));
     } finally {
       if (mounted) {
         setState(() => _isUploading = false);
@@ -344,7 +369,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
             children: <Widget>[
               ListTile(
                 leading: const Icon(Icons.camera_alt),
-                title: const Text('Take a picture'),
+                title: Text(AppLocalizations.of(context).takePicture),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera);
@@ -352,7 +377,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library),
-                title: const Text('Choose from gallery'),
+                title:  Text(AppLocalizations.of(context).chooseFromGallery),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
@@ -360,7 +385,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.cancel),
-                title: const Text('Cancel'),
+                title: Text(AppLocalizations.of(context).cancel),
                 onTap: () => Navigator.pop(context),
               ),
             ],
@@ -373,7 +398,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Post')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context).addPost)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -463,7 +488,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     if (_image != null)
                       IconButton(
                         icon: const Icon(Icons.refresh),
-                        tooltip: 'Generate another description',
+                        tooltip: AppLocalizations.of(context).generateAnotherDescription,
                         onPressed: _generateDescriptionWithAI,
                       ),
                   ],
@@ -481,7 +506,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     textCapitalization: TextCapitalization.sentences,
                     maxLines: 6,
                     decoration: InputDecoration(
-                      hintText: 'Add a brief description...',
+                      hintText: AppLocalizations.of(context).addBriefDescription,
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -509,8 +534,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                         ),
                       ),
                   )
-                  : const Text(
-                    'Post',
+                  : Text(
+                    AppLocalizations.of(context).post,
                     style: TextStyle(color: Colors.white),
                   ),
             ),

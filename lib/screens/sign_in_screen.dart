@@ -139,7 +139,7 @@ class SignInScreenState extends State<SignInScreen> {
     } on FirebaseAuthException catch (error) {
       _showSnackBar(_getAuthErrorMessage(error.code));
     } catch (error) {
-      _showSnackBar('An error occurred: $error');
+      _showSnackBar(AppLocalizations.of(context).errorOccurred(error.toString()));
     } finally {
       setState(() => _isLoading = false);
     }

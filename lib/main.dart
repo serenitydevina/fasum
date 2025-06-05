@@ -112,7 +112,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       message.notification!.body,
     );
   }
-}
+} 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
